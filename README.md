@@ -33,6 +33,8 @@ npm run dev
 
 `npm run build` produces the GitHub Pages-ready `dist/` directory.
 
+The page includes one randomly selected joke from the locally bundled, MIT-licensed [Official Joke API dataset](https://github.com/15Dkatz/official_joke_api). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for attribution and the pinned source revision.
+
 Available scripts:
 
 - `npm run dev` starts the Vite development server.

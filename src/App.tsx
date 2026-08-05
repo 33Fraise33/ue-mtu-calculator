@@ -11,6 +11,7 @@ import {
   type IpVersion,
   type OverheadGroup,
 } from "./calculator";
+import jokes from "./jokes.json";
 
 const ipOptions: IpVersion[] = ["IPv4", "IPv6"];
 
@@ -79,6 +80,7 @@ function CompositionBar({ groups, ueBytes, wanMtu, encapsulatedPacket, headroom,
 function App() {
   const [state, setState] = useState<CalculatorState>(() => decodeState(window.location.search));
   const [packetDraft, setPacketDraft] = useState(() => String(decodeState(window.location.search).ueTransmitPacketSize));
+  const [dadJoke] = useState(() => jokes[Math.floor(Math.random() * jokes.length)]);
   const result = useMemo(() => calculate(state), [state]);
 
   useEffect(() => {
@@ -100,10 +102,17 @@ function App() {
       <header className="hero">
         <div className="eyebrow"><span className="signal-dot" /> UE MTU Calculator - Transport Overhead</div>
         <div className="hero-grid">
-          <div>
+          <div className="hero-copy">
             <h1>See the packet before it hits the wire.</h1>
             <p className="lede">A transparent, layer by layer calculator for UE packets crossing GTP-U and an optional IPsec security gateway.</p>
           </div>
+          <section className="joke-card" aria-label="Dad joke">
+            <span className="joke-kicker">PACKET BREAK</span>
+            <div className="joke-content">
+              <p>{dadJoke.setup}</p>
+              <strong>{dadJoke.punchline}</strong>
+            </div>
+          </section>
           <div className="hero-note"><span>MODEL</span><b>UE IP → GTP-U → IPsec tunnel → WAN</b><small>Every byte stays visible. Padding is solved for the actual packet size.</small></div>
         </div>
       </header>

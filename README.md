@@ -21,27 +21,32 @@ This project was created completely with the help of AI and would not have been 
 
 If you find a mistake, incorrect standards interpretation, missing edge case, or useful improvement, please open an issue. Include the relevant configuration, expected result, and supporting reference when possible.
 
-## Run locally
+## Run with Docker
 
-Requires Node.js 22.12 or newer and npm.
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine with Docker Compose v2. Node.js and npm run inside the container; no host installation is required.
 
 ```sh
-npm ci
-npm test
-npm run dev
+docker compose run --rm app npm ci
+docker compose up
 ```
 
-`npm run build` produces the GitHub Pages-ready `dist/` directory.
+Open `http://localhost:5173` in a browser. Stop the development server with `Ctrl+C`.
+
+The source directory is mounted into the container and dependencies are stored in a Docker-managed volume. After changing `package.json` or `package-lock.json`, rerun `docker compose run --rm app npm ci`.
+
+`docker compose run --rm app npm run build` produces the GitHub Pages-ready `dist/` directory in the project folder.
 
 The page includes one randomly selected joke from the locally bundled, MIT-licensed [Official Joke API dataset](https://github.com/15Dkatz/official_joke_api). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for attribution and the pinned source revision.
 
-Available scripts:
+Available container commands:
 
-- `npm run dev` starts the Vite development server.
-- `npm test` runs the test suite once.
-- `npm run test:watch` runs Vitest in watch mode.
-- `npm run build` type-checks and builds the application.
-- `npm run preview` serves the production build locally.
+- `docker compose up` starts the Vite development server at `http://localhost:5173`.
+- `docker compose run --rm app npm test` runs the test suite once.
+- `docker compose run --rm app npm run test:watch` runs Vitest in watch mode.
+- `docker compose run --rm app npm run build` type-checks and builds the application.
+- `docker compose run --rm --service-ports app npm run preview -- --host 0.0.0.0` serves the production build at `http://localhost:4173`.
+- `docker compose run --rm app npm audit --audit-level=low` checks dependencies for known vulnerabilities.
+- `docker compose down -v` stops the containers and removes the dependency volume; run `docker compose run --rm app npm ci` before starting again.
 
 ## GitHub Pages
 
@@ -71,7 +76,7 @@ See [references.md](references.md) for the packet equations, byte-level assumpti
 
 ## Security and dependencies
 
-Dependencies are locked in `package-lock.json` and installed in CI with `npm ci`. GitHub Actions runs a scheduled npm audit; Dependabot checks for dependency and Actions updates.
+Dependencies are locked in `package-lock.json` and installed in CI with `npm ci`. GitHub Actions runs a scheduled npm audit; Dependabot checks for dependency and Actions updates. Use the Docker audit command above for the equivalent local check.
 
 Report security issues privately through the repository's security reporting process rather than opening a public issue.
 

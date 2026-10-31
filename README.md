@@ -56,6 +56,10 @@ Available container commands:
 
 The Vite base path is relative, so the app works under both a user site and a project site.
 
+The footer shows the version embedded at build time. On `main`, the deployment workflow uses conventional commits to create GitHub releases and tags: `fix:` increments the patch version, `feat:` increments the minor version, and a breaking change (`!` or a `BREAKING CHANGE:` footer) increments the major version. Other commits do not normally trigger a release, so deployments without a version bump show the same version. Use conventional commit messages when merging (including squash-merge titles).
+
+Release tags are the source of truth in CI; the workflow updates `package.json` and `package-lock.json` only in its build workspace before building. Local builds use the version checked into `package.json`. With no existing release tag, the first release is `v1.0.0`. The workflow needs permission to create tags and GitHub releases; branch or tag protection rules may require additional configuration.
+
 ## Model
 
 - WAN presets are 1500 byte Standard Ethernet, 1492 byte PPPoE, and 9000 byte Jumbo Frames.

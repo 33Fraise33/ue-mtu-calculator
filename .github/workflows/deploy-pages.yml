@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: main
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
@@ -29,21 +29,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - name: Create conventional-commit release
+      - name: Create patch releases for main commits
         id: release
-        uses: python-semantic-release/python-semantic-release@v10.7.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          config_file: releaserc.toml
-          commit: false
-          changelog: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/release.mjs
       - name: Set build version
         env:
           RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: |
-          if [ -n "$RELEASE_VERSION" ]; then
-            npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
-          fi
+          test -n "$RELEASE_VERSION"
+          npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
       - run: npm run build
       - uses: actions/upload-pages-artifact@v5
         with:
@@ -55,5 +51,14 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Check this is still the latest main commit
+        id: current
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          if [ "$latest" = "$TARGET_SHA" ]; then echo 'deploy=true' >> "$GITHUB_OUTPUT"; else echo 'Skipping stale deployment'; fi
       - id: deployment
+        if: steps.current.outputs.deploy == 'true'
         uses: actions/deploy-pages@v5

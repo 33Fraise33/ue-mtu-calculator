@@ -56,9 +56,9 @@ Available container commands:
 
 The Vite base path is relative, so the app works under both a user site and a project site.
 
-The footer shows the version embedded at build time. On `main`, the deployment workflow uses conventional commits to create GitHub releases and tags: `fix:` increments the patch version, `feat:` increments the minor version, and a breaking change (`!` or a `BREAKING CHANGE:` footer) increments the major version. Other commits do not normally trigger a release, so deployments without a version bump show the same version. Use conventional commit messages when merging (including squash-merge titles).
+The footer shows the version embedded at build time. Every first-parent commit pushed to `main`, including any kind of PR merge or direct push, receives a new patch version and a GitHub release, regardless of its commit message. Queued runs catch up on commits missed by GitHub Actions concurrency. The policy starts after commit `ae0f4bbf35398f8a65de20f56b833861a5be7786`; it does not create releases for earlier history. Reruns reuse existing tags, and a manual run only rebuilds a commit already tagged under this policy. An older run skips deployment if `main` has moved on.
 
-Release tags are the source of truth in CI; the workflow updates `package.json` and `package-lock.json` only in its build workspace before building. Local builds use the version checked into `package.json`. With no existing release tag, the first release is `v1.0.0`. The workflow needs permission to create tags and GitHub releases; branch or tag protection rules may require additional configuration.
+Release tags are the source of truth in CI; the workflow updates `package.json` and `package-lock.json` only in its build workspace before building. Local builds use the version checked into `package.json`, which is not automatically committed. A stable `v<major>.<minor>.<patch>` baseline tag must exist. The workflow needs permission to create tags and GitHub releases; branch or tag protection rules may require additional configuration. If a release fails, rerun the workflow to finish it using the same tag.
 
 ## Model
 

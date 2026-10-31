@@ -1,6 +1,0 @@
-[semantic_release]
-commit_parser = "conventional"
-tag_format = "v{version}"
-
-[semantic_release.branches.main]
-match = "main"
